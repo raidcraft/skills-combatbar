@@ -1,0 +1,8 @@
+main: de.raidcraft.hotbar.skills.RCSkillsHotbar
+name: RCSkillsHotbar
+version: ${project.version}#${build.number}
+description: Implementation of Combat Bar.
+author: Silthus
+website: http://www.raid-craft.de
+depend: [RaidCraft-API, RCCombatBar, RCSkills]
+database: false
