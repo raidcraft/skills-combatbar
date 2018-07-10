@@ -2,6 +2,7 @@ package de.raidcraft.hotbar.skills;
 
 import de.raidcraft.RaidCraft;
 import de.raidcraft.combatbar.api.Hotbar;
+import de.raidcraft.combatbar.api.HotbarException;
 import de.raidcraft.combatbar.api.HotbarSlot;
 import de.raidcraft.combatbar.api.HotbarSlotName;
 import de.raidcraft.skills.CharacterManager;
@@ -14,7 +15,6 @@ import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
 @HotbarSlotName("skill")
 public class SkillsHotbarSlot extends HotbarSlot {
@@ -50,12 +50,12 @@ public class SkillsHotbarSlot extends HotbarSlot {
     }
 
     @Override
-    public void onAttach(Hotbar hotbar) {
+    public void onAttach(Hotbar hotbar) throws HotbarException {
         try {
             Hero hero = RaidCraft.getComponent(CharacterManager.class).getHero(hotbar.getPlayer());
             this.skill = hero.getSkill(this.skillName);
         } catch (UnknownSkillException e) {
-            e.printStackTrace();
+            throw new HotbarException(e);
         }
     }
 

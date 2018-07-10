@@ -53,29 +53,16 @@ public class SkillsMenu extends ExplorerGui<Skill> {
         // Here, we need this option because we use the space to place actions.
         setKeepHorizontalScrollingSpace(true);
 
-        RaidCraft.getComponent(HotbarManager.class).getOrCreateHotbar(getPlayer())
-                .fillEmptySlots(getHotbarFiller());
-    }
-
-    private ItemStack getHotbarFiller() {
-        return new ItemStackBuilder(Material.END_CRYSTAL)
-                .title(ChatColor.GREEN + "Freier Hotbar Slot")
-                .longLore(ChatColor.YELLOW + "Ziehe einen Skill in diesen Slot um ihn in deiner Aktionsleiste zu speichern.", 60)
-                .item();
+        Hotbar hotbar = RaidCraft.getComponent(HotbarManager.class)
+                .getOrCreateHotbar(getPlayer(), SkillsHotbar.class);
+        hotbar.fillEmptySlots();
     }
 
     @Override
     protected void onClose() {
         super.onClose();
         RaidCraft.getComponent(HotbarManager.class).getActiveHotbar(getPlayer())
-                .ifPresent(hotbar -> {
-                    for (Integer index : hotbar.getIndicies()) {
-                        if (getHotbarFiller().isSimilar(getPlayer().getInventory().getItem(index))) {
-                            getPlayer().getInventory().clear(index);
-                        }
-                    }
-                    hotbar.fillEmptySlots();
-                });
+                .ifPresent(Hotbar::fillEmptySlots);
     }
 
     @Override
@@ -120,6 +107,7 @@ public class SkillsMenu extends ExplorerGui<Skill> {
         if (!skill.isUnlocked() || !skill.isActive()) return;
 
         RaidCraft.getComponent(HotbarManager.class).getActiveHotbar(getPlayer())
+                .filter(SkillsHotbar.class::isInstance)
                 .ifPresent(hotbar -> hotbar.addHotbarSlot(new SkillsHotbarSlot(skill)));
     }
 
@@ -136,7 +124,9 @@ public class SkillsMenu extends ExplorerGui<Skill> {
         }
 
         ItemStack cursor = event.getCursor();
-        Optional<Hotbar> activeHotbar = RaidCraft.getComponent(HotbarManager.class).getActiveHotbar(getPlayer());
+        Optional<Hotbar> activeHotbar = RaidCraft.getComponent(HotbarManager.class)
+                .getActiveHotbar(getPlayer())
+                .filter(SkillsHotbar.class::isInstance);
 
         if (cursor == null || cursor.getType() == Material.AIR) {
             activeHotbar.ifPresent(hotbar -> hotbar.removeHotbarSlot(event.getSlot()));

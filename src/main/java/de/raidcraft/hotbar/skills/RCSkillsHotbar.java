@@ -14,8 +14,9 @@ public class RCSkillsHotbar extends BasePlugin {
 
     @Override
     public void enable() {
-        RaidCraft.getComponent(HotbarManager.class)
-                .registerHotbarSlotType(this, SkillsHotbarSlot.class);
+        HotbarManager hotbarManager = RaidCraft.getComponent(HotbarManager.class);
+        hotbarManager.registerHotbarType(this, SkillsHotbar.class);
+        hotbarManager.registerHotbarSlotType(SkillsHotbarSlot.class);
         registerCommands(HotbarCommand.class);
     }
 
