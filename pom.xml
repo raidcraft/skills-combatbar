@@ -27,7 +27,7 @@
     <parent>
         <groupId>de.faldoria</groupId>
         <artifactId>FaldoriaMasterPom</artifactId>
-        <version>1.12-0.10</version>
+        <version>1.12-0.11</version>
     </parent>
 
     <repositories>
