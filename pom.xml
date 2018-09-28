@@ -16,8 +16,9 @@
   ~ along with this program. If not, see <http://www.gnu.org/licenses />.
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" 
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <artifactId>skills-hotbar</artifactId>
     <packaging>jar</packaging>
@@ -27,7 +28,7 @@
     <parent>
         <groupId>de.faldoria</groupId>
         <artifactId>FaldoriaMasterPom</artifactId>
-        <version>1.12-0.11</version>
+        <version>1.12-0.15</version>
     </parent>
 
     <repositories>
@@ -35,17 +36,13 @@
             <id>faldoria-deps</id>
             <url>https://repo.faldoria.de/artifactory/faldoria-repo/</url>
         </repository>
-        <repository>
-            <id>zDevelopers</id>
-            <url>http://maven.carrade.eu/artifactory/snapshots</url>
-        </repository>
     </repositories>
 
     <dependencies>
         <dependency>
             <groupId>de.faldoria</groupId>
             <artifactId>raidcraft-api</artifactId>
-            <version>1.12-0.1-SNAPSHOT</version>
+            <version>1.12-0.5-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>de.faldoria</groupId>
@@ -56,11 +53,6 @@
             <groupId>de.faldoria</groupId>
             <artifactId>skills</artifactId>
             <version>1.12-0.1-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>fr.zcraft</groupId>
-            <artifactId>zlib</artifactId>
-            <version>0.99-SNAPSHOT</version>
         </dependency>
     </dependencies>
 </project>
