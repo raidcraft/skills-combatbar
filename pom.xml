@@ -23,7 +23,7 @@
     <artifactId>skills-hotbar</artifactId>
     <packaging>jar</packaging>
     <version>1.12-0.1-SNAPSHOT</version>
-    <name>RCSkillsHotbar</name>
+    <name>RCSkillsCombatBar</name>
 
     <parent>
         <groupId>de.faldoria</groupId>
