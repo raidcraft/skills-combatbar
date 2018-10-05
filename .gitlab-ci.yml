@@ -12,12 +12,7 @@ cache:
 build:
   stage: build
   script:
-    - mvn $MAVEN_CLI_OPTS clean compile
-  artifacts:
-    name: Plugin
-    paths:
-    - target/*.jar
-    expire_in: 1 week
+    - mvn $MAVEN_CLI_OPTS compile
 
 test:
   stage: test
@@ -30,3 +25,8 @@ deploy:
     - mvn $MAVEN_CLI_OPTS deploy
   only:
     - master
+  artifacts:
+    name: Plugin
+    paths:
+    - target/*.jar
+    expire_in: 1 week
