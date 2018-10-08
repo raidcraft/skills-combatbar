@@ -11,6 +11,7 @@ import de.raidcraft.skills.api.hero.Hero;
 import de.raidcraft.skills.api.skill.Skill;
 import de.raidcraft.skills.util.SkillUtil;
 import fr.zcraft.zlib.tools.items.ItemStackBuilder;
+import lombok.Getter;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
@@ -19,6 +20,7 @@ import org.bukkit.inventory.ItemStack;
 @HotbarSlotName("skill")
 public class SkillsHotbarSlot extends HotbarSlot {
 
+    @Getter
     private Skill skill;
     private String skillName;
 

@@ -3,6 +3,7 @@ package de.raidcraft.hotbar.skills;
 import de.raidcraft.RaidCraft;
 import de.raidcraft.combatbar.HotbarManager;
 import de.raidcraft.combatbar.api.Hotbar;
+import de.raidcraft.combatbar.api.HotbarSlot;
 import de.raidcraft.skills.CharacterManager;
 import de.raidcraft.skills.api.combat.EffectType;
 import de.raidcraft.skills.api.exceptions.UnknownSkillException;
@@ -14,6 +15,7 @@ import fr.zcraft.zlib.tools.items.ItemStackBuilder;
 import lombok.Getter;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.ItemStack;
@@ -53,16 +55,7 @@ public class SkillsMenu extends ExplorerGui<Skill> {
         // Here, we need this option because we use the space to place actions.
         setKeepHorizontalScrollingSpace(true);
 
-        Hotbar hotbar = RaidCraft.getComponent(HotbarManager.class)
-                .getOrCreateHotbar(getPlayer(), SkillsHotbar.class);
-        hotbar.fillEmptySlots();
-    }
-
-    @Override
-    protected void onClose() {
-        super.onClose();
-        RaidCraft.getComponent(HotbarManager.class).getActiveHotbar(getPlayer())
-                .ifPresent(Hotbar::fillEmptySlots);
+        RaidCraft.getComponent(HotbarManager.class).getOrCreateHotbar(getPlayer(), SkillsHotbar.class);
     }
 
     @Override
@@ -86,7 +79,7 @@ public class SkillsMenu extends ExplorerGui<Skill> {
                 .title(SkillUtil.formatHeader(skill));
 
         for (String line : SkillUtil.formatBody(skill)) {
-            sb.longLore(line, 60);
+            sb.longLore(line, 30);
         }
 
         return sb.item();
@@ -103,50 +96,87 @@ public class SkillsMenu extends ExplorerGui<Skill> {
     }
 
     @Override
-    protected void onRightClick(Skill skill) {
-        if (!skill.isUnlocked() || !skill.isActive()) return;
-
-        RaidCraft.getComponent(HotbarManager.class).getActiveHotbar(getPlayer())
-                .filter(SkillsHotbar.class::isInstance)
-                .ifPresent(hotbar -> hotbar.addHotbarSlot(new SkillsHotbarSlot(skill)));
-    }
-
-    @Override
     protected void onClick(InventoryClickEvent event) {
         super.onClick(event);
 
-        if (event.getSlotType() != InventoryType.SlotType.QUICKBAR) {
-            if (event.getCursor() != null && event.getCursor().getType() != Material.AIR) {
-                event.setCurrentItem(null);
-                event.setCancelled(true);
-            }
-            return;
-        }
-
-        ItemStack cursor = event.getCursor();
-        Optional<Hotbar> activeHotbar = RaidCraft.getComponent(HotbarManager.class)
-                .getActiveHotbar(getPlayer())
-                .filter(SkillsHotbar.class::isInstance);
-
-        if (cursor == null || cursor.getType() == Material.AIR) {
-            activeHotbar.ifPresent(hotbar -> hotbar.removeHotbarSlot(event.getSlot()));
+        if (event.getClick() != ClickType.LEFT) {
             event.setCancelled(true);
             return;
         }
 
-        activeHotbar.filter(hotbar -> hotbar.getIndicies().contains(event.getSlot()))
-                .ifPresent(hotbar -> {
-                    try {
-                        Skill skill = RaidCraft.getComponent(CharacterManager.class).getHero(getPlayer())
-                            .getSkill(ChatColor.stripColor(cursor.getItemMeta().getDisplayName()));
-                        hotbar.setHotbarSlot(event.getSlot(), new SkillsHotbarSlot(skill));
-                        event.setCursor(new ItemStack(Material.AIR));
-                        event.setCancelled(true);
-                    } catch (UnknownSkillException e) {
-                        getPlayer().sendMessage(ChatColor.RED + e.getMessage());
-                        e.printStackTrace();
-                    }
+        Optional<Hotbar> activeHotbar = RaidCraft.getComponent(HotbarManager.class)
+                .getActiveHotbar(getPlayer())
+                .filter(SkillsHotbar.class::isInstance);
+
+        Boolean isHotbarSlot = event.getSlotType() == InventoryType.SlotType.QUICKBAR
+                && activeHotbar.map(hotbar -> hotbar.getHotbarSlot(event.getSlot()).isPresent()).orElse(false);
+
+        if (event.getCursor() == null || event.getCursor().getType() == Material.AIR) {
+            if (isHotbarSlot) {
+                // remove active hotbar slots to make place for items
+                activeHotbar.ifPresent(hotbar -> {
+                    hotbar.removeHotbarSlot(event.getSlot())
+                            .filter(slot -> slot instanceof SkillsHotbarSlot)
+                            .map(slot -> (SkillsHotbarSlot) slot)
+                            .filter(slot -> slot.getSkill() != null)
+                            .map(SkillsHotbarSlot::getSkill)
+                            .map(this::getPickedUpItem)
+                            .ifPresent(event::setCursor);
                 });
+            }
+            // the player is trying to pick up something, which is handled elsewhere
+            return;
+        }
+
+        try {
+            Skill skill = RaidCraft.getComponent(CharacterManager.class).getHero(getPlayer())
+                    .getSkill(ChatColor.stripColor(event.getCursor().getItemMeta().getDisplayName()));
+            // the player is holding a hotbar skill
+            if (event.getSlotType() != InventoryType.SlotType.QUICKBAR) {
+                if (event.getClickedInventory() == null) {
+                    // handle clicking outside of inventory
+                    event.setCancelled(true);
+                    return;
+                }
+                if (event.getClickedInventory().equals(getInventory())) {
+                    event.setCursor(null);
+                    event.setCancelled(true);
+                    return;
+                }
+                getPlayer().sendMessage(ChatColor.RED + "Du kannst Skills nur in Deiner Aktionsleiste platzieren.");
+                event.setCancelled(true);
+                return;
+            }
+            // the player is placing a skill in the wrong hotbarslots
+            if (event.getSlot() < 2) {
+                getPlayer().sendMessage(ChatColor.RED + "Du kannst Skills nur in den Slots der Aktionsleiste " + ChatColor.AQUA + "drei" + ChatColor.RED + " bis " + ChatColor.AQUA + "neun" + ChatColor.RED + " platzieren.");
+                getPlayer().sendMessage(ChatColor.GRAY + "Die ersten beiden Slots sind für Waffen und Gegenstände reserviert.");
+                event.setCancelled(true);
+                return;
+            }
+            event.setCursor(event.getCurrentItem());
+            event.setCurrentItem(null);
+            activeHotbar.ifPresent(hotbar -> {
+                Optional<HotbarSlot> removedSlot = hotbar.setHotbarSlot(event.getSlot(), new SkillsHotbarSlot(skill));
+                removedSlot.filter(slot -> slot instanceof SkillsHotbarSlot)
+                        .map(slot -> ((SkillsHotbarSlot) slot).getSkill())
+                        .map(this::getPickedUpItem)
+                        .ifPresent(event::setCursor);
+            });
+            event.setCancelled(true);
+        } catch (UnknownSkillException e) {
+            // ignore unknown skills - we are probably handling a normal item
+            if (isHotbarSlot) {
+                // make place for the item in hand
+                activeHotbar.ifPresent(hotbar -> {
+                    hotbar.removeHotbarSlot(event.getSlot())
+                            .filter(slot -> slot instanceof SkillsHotbarSlot)
+                            .map(slot -> (SkillsHotbarSlot) slot)
+                            .filter(slot -> slot.getSkill() != null)
+                            .ifPresent(slot -> getPlayer().sendMessage(ChatColor.GRAY + slot.getSkill().getFriendlyName() + " wurde aus deiner Hotbar entfernt."));
+                });
+            }
+        }
     }
 
     @Override
