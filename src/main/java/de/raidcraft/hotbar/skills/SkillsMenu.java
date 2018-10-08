@@ -184,6 +184,18 @@ public class SkillsMenu extends ExplorerGui<Skill> {
         return false;
     }
 
+    @Override
+    protected void onClose() {
+        super.onClose();
+        try {
+            RaidCraft.getComponent(CharacterManager.class).getHero(getPlayer())
+                    .getSkill(ChatColor.stripColor(getPlayer().getItemOnCursor().getItemMeta().getDisplayName()));
+            getPlayer().setItemOnCursor(new ItemStack(Material.AIR));
+        } catch (UnknownSkillException e) {
+            // ignored
+        }
+    }
+
     @GuiAction("close")
     private void close_gui() {
         close();
