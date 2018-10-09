@@ -7,6 +7,7 @@ import de.raidcraft.api.BasePlugin;
 import de.raidcraft.combatbar.HotbarManager;
 import de.raidcraft.skills.api.skill.PlayerUnlockSkillEvent;
 import de.raidcraft.skills.util.SkillUtil;
+import de.raidcraft.util.CommandUtil;
 import fr.zcraft.zlib.components.gui.Gui;
 import fr.zcraft.zlib.components.gui.GuiBase;
 import lombok.Getter;
@@ -43,6 +44,10 @@ public class RCSkillsHotbar extends BasePlugin implements Listener {
             if (openGui != null && openGui.isOpen()) return;
             Gui.open(holder.getPlayer(), new SkillsMenu());
         });
+    }
+
+    public void openSkillMenu(Player player) {
+        Gui.open(player, new SkillsMenu());
     }
 
     @Override
@@ -91,7 +96,7 @@ public class RCSkillsHotbar extends BasePlugin implements Listener {
                 desc = "Opens the Skills hotbar menu."
         )
         public void hotbar(CommandContext args, CommandSender sender) {
-            Gui.open((Player) sender, new SkillsMenu());
+            openSkillMenu((Player) sender);
         }
     }
 }
