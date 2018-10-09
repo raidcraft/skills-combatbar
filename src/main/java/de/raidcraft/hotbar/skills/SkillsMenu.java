@@ -7,6 +7,7 @@ import de.raidcraft.combatbar.api.HotbarSlot;
 import de.raidcraft.skills.CharacterManager;
 import de.raidcraft.skills.api.combat.EffectType;
 import de.raidcraft.skills.api.exceptions.UnknownSkillException;
+import de.raidcraft.skills.api.hero.Hero;
 import de.raidcraft.skills.api.skill.Skill;
 import de.raidcraft.skills.util.SkillUtil;
 import fr.zcraft.zlib.components.gui.ExplorerGui;
@@ -189,9 +190,11 @@ public class SkillsMenu extends ExplorerGui<Skill> {
         super.onClose();
         try {
             ItemStack itemOnCursor = getPlayer().getItemOnCursor();
-            if (itemOnCursor != null) {
-                RaidCraft.getComponent(CharacterManager.class).getHero(getPlayer())
-                        .getSkill(ChatColor.stripColor(itemOnCursor.getItemMeta().getDisplayName()));
+            if (itemOnCursor != null && itemOnCursor.getType() != Material.AIR && itemOnCursor.getItemMeta() != null) {
+                Hero hero = RaidCraft.getComponent(CharacterManager.class).getHero(getPlayer());
+                if (hero != null) {
+                    hero.getSkill(ChatColor.stripColor(itemOnCursor.getItemMeta().getDisplayName()));
+                }
                 getPlayer().setItemOnCursor(new ItemStack(Material.AIR));
             }
         } catch (UnknownSkillException e) {

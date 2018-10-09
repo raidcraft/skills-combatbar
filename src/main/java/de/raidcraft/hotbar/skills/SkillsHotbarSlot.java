@@ -15,6 +15,7 @@ import lombok.Getter;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
 @HotbarSlotName("skill")
@@ -77,7 +78,16 @@ public class SkillsHotbarSlot extends HotbarSlot {
     @Override
     public void onSelect(Player player) {
         if (skill == null) {
-            player.sendMessage("Something went wrong...");
+            player.sendMessage("Der Skill wurde nicht gefunden...");
+            return;
+        }
+        skill.use();
+    }
+
+    @Override
+    public void onRightClickInteract(PlayerInteractEvent event) {
+        if (skill == null) {
+            event.getPlayer().sendMessage("Der Skill wurde nicht gefunden...");
             return;
         }
         skill.use();
