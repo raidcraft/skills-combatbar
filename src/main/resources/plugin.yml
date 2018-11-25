@@ -6,3 +6,4 @@ author: Silthus
 website: http://www.raid-craft.de
 depend: [RaidCraft-API, RCCombatBar, RCSkills]
 database: false
+api-version: 1.13
