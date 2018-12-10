@@ -32,13 +32,13 @@ public class RCSkillsHotbar extends BasePlugin implements Listener {
         hotbarManager = RaidCraft.getComponent(HotbarManager.class);
         hotbarManager.registerHotbarType(this, SkillsHotbar.class);
         hotbarManager.registerHotbarSlotType(SkillsHotbarSlot.class);
-        loadComponents(Gui.class);
         registerCommands(HotbarCommand.class);
-        registerEvents(this);
     }
 
     @Override
     public void loadDependencyConfigs() {
+        loadComponents(Gui.class);
+        registerEvents(this);
         RaidCraft.getComponent(HotbarManager.class).addHotbarMenuAction(holder -> {
             GuiBase openGui = Gui.getOpenGui(holder.getPlayer());
             if (openGui != null && openGui.isOpen()) return;
