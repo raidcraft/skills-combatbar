@@ -5,6 +5,7 @@ import com.sk89q.minecraft.util.commands.CommandContext;
 import de.raidcraft.RaidCraft;
 import de.raidcraft.api.BasePlugin;
 import de.raidcraft.combatbar.HotbarManager;
+import de.raidcraft.skills.api.skill.Active;
 import de.raidcraft.skills.api.skill.PlayerUnlockSkillEvent;
 import de.raidcraft.skills.util.SkillUtil;
 import de.raidcraft.util.CommandUtil;
@@ -60,6 +61,7 @@ public class RCSkillsHotbar extends BasePlugin implements Listener {
         if (event.getSkill().isHidden()
                 || !event.getSkill().isActive()
                 || !event.getSkill().isEnabled()
+                || !(event.getSkill() instanceof Active)
                 || (event.getHero().getVirtualProfession() != null && event.getHero().getVirtualProfession().equals(event.getSkill().getProfession()))) {
             return;
         }
