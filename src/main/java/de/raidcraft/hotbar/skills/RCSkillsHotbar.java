@@ -60,7 +60,7 @@ public class RCSkillsHotbar extends BasePlugin implements Listener {
         if (event.getSkill().isHidden()
                 || !event.getSkill().isActive()
                 || !event.getSkill().isEnabled()
-                || event.getHero().getVirtualProfession().equals(event.getSkill().getProfession())) {
+                || (event.getHero().getVirtualProfession() != null && event.getHero().getVirtualProfession().equals(event.getSkill().getProfession()))) {
             return;
         }
 
